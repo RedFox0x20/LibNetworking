@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
 
 namespace LibNetworking
 {
@@ -18,10 +19,11 @@ namespace LibNetworking
 		int _Port;
 		public readonly int _ID;
 
-		bool _Connected { get { return _Client == null ? false : _Client.Connected; } }
+		public bool _Connected { get { return _Client == null ? false : _Client.Connected; } }
 		NetworkStream _Stream { get { return _Client == null ? null : _Client.GetStream(); } }
 
 		Thread _ListenThread;
+		public Thread GetListenThread() { return _ListenThread; }
 
 		public event ConnectionEvent OnConnect, OnDisconnect;
 		public event MessageEvent OnMessageSent, OnMessageRecieved;
@@ -114,6 +116,16 @@ namespace LibNetworking
 				_Stream.Write(DataBytes, 0, DataBytes.Length);
 				OnMessageSent(this, Message);
 				return true;
+			}
+			catch { Disconnect(); return false; }
+		}
+
+		public bool SendImage(string ImagePath)
+		{
+			if (!_Connected) { return false; }
+			try
+			{
+				return false;
 			}
 			catch { Disconnect(); return false; }
 		}

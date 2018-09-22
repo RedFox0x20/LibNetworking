@@ -16,8 +16,11 @@ namespace LibNetworking
 		bool _Running;
 
 		List<TcpClient> _ConnectedClients;
-		int _ConnectedClientCount { get { return _ConnectedClients.Count; } }
-
+		public int _ConnectedClientCount { get { return _ConnectedClients.Count; } }
+		public TcpClient[] GetClients()
+		{
+			return _ConnectedClients == null ? null : _ConnectedClients.ToArray();
+		}
 		Thread _ListenForClientsThread;
 		
 		public event ConnectionEvent OnClientConnect, OnClientDisconnect;
@@ -52,6 +55,7 @@ namespace LibNetworking
 		{
 			if (!_Running) { return; }
 			_Running = false;
+			SendMessageToAllClients("DISCONNECT");
 			_Listener.Stop();
 		}
 
@@ -63,7 +67,9 @@ namespace LibNetworking
 			{
 				while (_Running)
 				{
+					#if DEBUG
 					Console.WriteLine("Wait for client!");
+					#endif	
 					ConnectingClient = new TcpClient(_ConnectedClientCount, _Listener.AcceptTcpClient());
 					ConnectingClient.OnConnect += OnClientConnect;
 					ConnectingClient.OnDisconnect += OnClientDisconnect;
