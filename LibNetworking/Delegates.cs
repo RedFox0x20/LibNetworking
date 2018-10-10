@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace LibNetworking
 {
-	public delegate void MessageEvent(TcpClient Client, string MessageData);
+	public delegate void MessageEvent(TcpClient Client, byte[] RawData, string MessageData);
 	public delegate void ConnectionEvent(TcpClient Client);
 }

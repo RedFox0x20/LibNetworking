@@ -28,6 +28,8 @@ namespace LibNetworking
 		public event ConnectionEvent OnConnect, OnDisconnect;
 		public event MessageEvent OnMessageSent, OnMessageRecieved;
 
+		public string ClientInfoString;
+
 		public TcpClient(string Hostname, int Port, int ID = -1)
 		{
 			_Client = new System.Net.Sockets.TcpClient();
@@ -63,7 +65,7 @@ namespace LibNetworking
 			} catch { return false; }
 		}
 
-		public void Restart()
+		public void Reconnect()
 		{
 			Connect();
 			Disconnect();
@@ -96,7 +98,19 @@ namespace LibNetworking
 					_Stream.Read(MainDataBytes, 0, Size);
 					MainDataString = Encoding.ASCII.GetString(MainDataBytes);
 
-					OnMessageRecieved(this, MainDataString);
+					if (MainDataString == "IMAGE")
+					{
+						// Get size
+						SizeDataBytes = new byte[SizeOfInt32];
+						_Stream.Read(SizeDataBytes, 0, SizeOfInt32);
+						Size = BitConverter.ToInt32(SizeDataBytes, 0);
+						// Read primary data
+						MainDataBytes = new byte[Size];
+						_Stream.Read(MainDataBytes, 0, Size);
+						MainDataString = "IMAGE";
+					}
+
+					OnMessageRecieved(this, MainDataBytes, MainDataString);
 				}
 				else 
 				{
@@ -113,8 +127,8 @@ namespace LibNetworking
 			{
 				byte[] DataBytes = Encoding.ASCII.GetBytes(Message);
 				_Stream.Write(BitConverter.GetBytes(DataBytes.Length), 0, 4);
-				_Stream.Write(DataBytes, 0, DataBytes.Length);
-				OnMessageSent(this, Message);
+				_Stream.Write(DataBytes, 0, DataBytes.Length);	
+				OnMessageSent(this, DataBytes, Message);
 				return true;
 			}
 			catch { Disconnect(); return false; }
@@ -125,6 +139,11 @@ namespace LibNetworking
 			if (!_Connected) { return false; }
 			try
 			{
+				byte[] ReadBytes = File.ReadAllBytes(ImagePath);
+				Send("IMAGE");
+				_Stream.Write(BitConverter.GetBytes(ReadBytes.Length), 0, 4);
+				_Stream.Write(ReadBytes, 0, ReadBytes.Length);
+
 				return false;
 			}
 			catch { Disconnect(); return false; }

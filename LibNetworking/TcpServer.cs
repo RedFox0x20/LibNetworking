@@ -56,6 +56,9 @@ namespace LibNetworking
 			if (!_Running) { return; }
 			_Running = false;
 			SendMessageToAllClients("DISCONNECT");
+			// Complains due to the modification of the List<TcpClient>
+			//_ConnectedClients.ForEach(client => { client.Disconnect(); });
+			//_ConnectedClients.Clear();
 			_Listener.Stop();
 		}
 
@@ -72,7 +75,7 @@ namespace LibNetworking
 					#endif	
 					ConnectingClient = new TcpClient(_ConnectedClientCount, _Listener.AcceptTcpClient());
 					ConnectingClient.OnConnect += OnClientConnect;
-					ConnectingClient.OnDisconnect += OnClientDisconnect;
+					ConnectingClient.OnDisconnect += (TcpClient Client) => { _ConnectedClients.Remove(Client); OnClientDisconnect(Client); };
 					ConnectingClient.OnMessageRecieved += OnMessageRecieved;
 					ConnectingClient.OnMessageSent += OnMessageSent;
 

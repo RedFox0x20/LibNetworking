@@ -49,12 +49,12 @@ namespace Testing
 			Console.ReadKey();
 		}
 
-		private void Cl_OnMessageSent(TcpClient Client, string MessageData)
+		private void Cl_OnMessageSent(TcpClient Client, byte[] RawData, string MessageData)
 		{
 			Console.WriteLine("[CLIENT] Sent> " + MessageData);
 		}
 
-		private void Cl_OnMessageRecieved(TcpClient Client, string MessageData)
+		private void Cl_OnMessageRecieved(TcpClient Client, byte[] RawData, string MessageData)
 		{
 			Console.WriteLine("[CLIENT] Recieved> " + MessageData);
 		}
@@ -69,12 +69,12 @@ namespace Testing
 			Console.WriteLine("[CLIENT] Connected");
 		}
 
-		private void Sv_OnMessageSent(TcpClient Client, string MessageData)
+		private void Sv_OnMessageSent(TcpClient Client, byte[] RawData, string MessageData)
 		{
 			Console.WriteLine("[SERVER] Message sent> " + MessageData);
 		}
 
-		private void Sv_OnMessageRecieved(TcpClient Client, string MessageData)
+		private void Sv_OnMessageRecieved(TcpClient Client, byte[] RawData, string MessageData)
 		{
 			Console.WriteLine("[SERVER] Recieved> " + MessageData);
 		}
